@@ -9,22 +9,21 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-# 2) Dependências PHP (sem dev)
-FROM composer:2 AS vendor
+# 2) Servidor: FrankenPHP (Caddy + PHP 8.4).
+# O Laravel 13 usa Symfony 8, que exige PHP >= 8.4.1. As dependências são instaladas AQUI, com o mesmo PHP e as mesmas
+# extensões da execução, para que qualquer incompatibilidade quebre no build e não só ao iniciar.
+FROM dunglas/frankenphp:1-php8.4
+RUN install-php-extensions pdo_sqlite intl opcache zip bcmath
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
 WORKDIR /app
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction --ignore-platform-reqs
-COPY . .
-RUN composer dump-autoload --optimize --no-dev --classmap-authoritative --ignore-platform-reqs
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction
 
-# 3) Servidor: FrankenPHP (Caddy + PHP 8.3)
-FROM dunglas/frankenphp:1-php8.3
-RUN install-php-extensions pdo_sqlite intl opcache zip bcmath
-
-WORKDIR /app
 COPY . .
-COPY --from=vendor /app/vendor ./vendor
+RUN composer dump-autoload --optimize --no-dev --classmap-authoritative
 COPY --from=assets /app/public/build ./public/build
+
 COPY deploy/Caddyfile /etc/caddy/Caddyfile
 COPY deploy/entrypoint.sh /usr/local/bin/entrypoint
 RUN sed -i 's/\r$//' /usr/local/bin/entrypoint && chmod +x /usr/local/bin/entrypoint \
