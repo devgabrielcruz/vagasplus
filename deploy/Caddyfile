@@ -1,0 +1,13 @@
+{
+	frankenphp
+	auto_https off
+	admin off
+}
+
+# A plataforma injeta a porta em $PORT e termina o HTTPS na frente do contêiner.
+:{$PORT:8080} {
+	root * /app/public
+	encode zstd gzip
+	header -Server
+	php_server
+}

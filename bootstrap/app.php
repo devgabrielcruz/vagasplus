@@ -17,6 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Atrás de um proxy HTTPS (Railway, Render...), confia nos cabeçalhos X-Forwarded-* para gerar URLs https.
+        // Só ativa quando TRUSTED_PROXIES está definido (ex.: "*"); em desenvolvimento local nada muda.
+        $middleware->trustProxies(at: env('TRUSTED_PROXIES') ?: null);
+
         $middleware->web(append: [
             HandleInertiaRequests::class,
             SecurityHeaders::class,
