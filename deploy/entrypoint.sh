@@ -31,7 +31,9 @@ php artisan migrate --force --no-interaction
 
 # Administrador de teste (opcional): a senha precisa ter pelo menos 12 caracteres.
 if [ -n "$ADMIN_EMAIL" ] && [ -n "$ADMIN_PASSWORD" ]; then
-    php artisan admin:create "$ADMIN_EMAIL" --name="${ADMIN_NAME:-Administrador}" --password="$ADMIN_PASSWORD" --no-interaction
+    # Se falhar (ex.: senha curta), o site sobe mesmo assim: só o login do admin fica indisponível.
+    php artisan admin:create "$ADMIN_EMAIL" --name="${ADMIN_NAME:-Administrador}" --password="$ADMIN_PASSWORD" --no-interaction \
+        || echo "AVISO: administrador NÃO criado. Corrija ADMIN_EMAIL/ADMIN_PASSWORD (senha com 12+ caracteres) e faça um novo deploy." >&2
 fi
 
 php artisan config:cache
