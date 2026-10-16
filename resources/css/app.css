@@ -1,0 +1,273 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms' { strategy: base; }
+
+@source '../**/*.blade.php';
+@source '../**/*.vue';
+@source '../**/*.ts';
+
+/*
+|--------------------------------------------------------------------------
+| VagasPlus — design tokens
+|--------------------------------------------------------------------------
+| Institucional: azul-marinho. Ação: azul vibrante. Superfícies neutras e
+| frias. Todos os componentes usam estes tokens (nunca cores soltas).
+*/
+@theme {
+    --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+    /* Marca */
+    --color-navy-950: #071433;
+    --color-navy-900: #0b1f4d;
+    --color-navy-800: #112a63;
+    --color-navy-700: #1a3a82;
+    --color-navy-200: #c7d3ee;
+    --color-navy-100: #dfe6f5;
+    --color-navy-50: #eef2fa;
+
+    /* Ação */
+    --color-action-700: #1d4fd8;
+    --color-action-600: #2563eb;
+    --color-action-500: #3b78f5;
+    --color-action-200: #bfd4ff;
+    --color-action-100: #dbe7ff;
+    --color-action-50: #eff5ff;
+
+    /* Neutros */
+    --color-surface: #f5f7fb;
+    --color-card: #ffffff;
+    --color-ink: #0f1a33;
+    --color-muted: #55617c;
+    --color-subtle: #7b869f;
+    --color-line: #e2e7f1;
+    --color-line-strong: #c9d1e2;
+
+    /* Estados */
+    --color-success-700: #0f6b46;
+    --color-success-50: #e6f6ee;
+    --color-warning-700: #8a5300;
+    --color-warning-50: #fff4e0;
+    --color-danger-700: #b42318;
+    --color-danger-50: #fdecea;
+    --color-info-700: #1d4fd8;
+    --color-info-50: #eff5ff;
+
+    /* Raios, sombras */
+    --radius-card: 18px;
+    --radius-panel: 22px;
+    --radius-control: 12px;
+    --shadow-xs: 0 1px 2px rgb(15 26 51 / 0.05);
+    --shadow-card: 0 1px 2px rgb(15 26 51 / 0.04), 0 2px 8px -2px rgb(15 26 51 / 0.06);
+    --shadow-lift: 0 4px 8px rgb(15 26 51 / 0.04), 0 18px 36px -14px rgb(37 99 235 / 0.28);
+    --shadow-pop: 0 10px 30px -10px rgb(11 31 77 / 0.25);
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+    }
+
+    /* O preflight do Tailwind v4 deixa botões com o cursor padrão: tudo que é clicável mostra a mãozinha. */
+    button:not(:disabled),
+    [role='button']:not([aria-disabled='true']),
+    [role='tab'],
+    summary,
+    select,
+    input[type='checkbox']:not(:disabled),
+    input[type='radio']:not(:disabled),
+    input[type='file']:not(:disabled),
+    label[for] {
+        cursor: pointer;
+    }
+
+    button:disabled,
+    [aria-disabled='true'] {
+        cursor: not-allowed;
+    }
+
+    body {
+        font-family: var(--font-sans);
+        font-feature-settings: 'cv11', 'ss01';
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--color-action-600);
+        outline-offset: 2px;
+        border-radius: 6px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        html {
+            scroll-behavior: auto;
+        }
+
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+}
+
+@utility btn {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-(--radius-control) px-4 text-sm font-semibold transition-colors duration-150 select-none disabled:cursor-not-allowed disabled:opacity-55;
+}
+
+/* Escala tipográfica */
+@utility t-display {
+    @apply text-[1.9rem] leading-tight font-extrabold tracking-tight text-balance sm:text-5xl;
+}
+@utility t-h1 {
+    @apply text-2xl font-extrabold tracking-tight text-balance sm:text-3xl;
+}
+@utility t-h2 {
+    @apply text-xl font-extrabold;
+}
+@utility t-h3 {
+    @apply text-base leading-snug font-bold;
+}
+@utility t-eyebrow {
+    @apply text-xs font-bold tracking-widest uppercase;
+}
+
+@layer components {
+    .container-page {
+        @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
+    }
+
+    /* Botões */
+    .btn-primary {
+        @apply btn bg-linear-to-b from-action-500 to-action-600 text-white shadow-[0_1px_2px_rgb(29_79_216/0.4),inset_0_1px_0_rgb(255_255_255/0.18)] hover:from-action-600 hover:to-action-700 active:to-action-700;
+    }
+    .btn-secondary {
+        @apply btn border border-line-strong bg-white text-ink hover:border-navy-700 hover:bg-navy-50;
+    }
+    .btn-ghost {
+        @apply btn text-muted hover:bg-navy-50 hover:text-ink;
+    }
+    .btn-dark {
+        @apply btn bg-navy-900 text-white hover:bg-navy-800;
+    }
+    .btn-danger {
+        @apply btn bg-danger-700 text-white hover:bg-red-800;
+    }
+    .btn-sm {
+        @apply min-h-9 px-3 text-[13px];
+    }
+    .btn-lg {
+        @apply min-h-12 px-6 text-base;
+    }
+
+    /* Campos */
+    .field {
+        @apply block min-h-11 w-full rounded-(--radius-control) border border-line-strong bg-white px-3 text-sm text-ink shadow-none placeholder:text-subtle focus:border-action-600 focus:ring-2 focus:ring-action-100;
+    }
+    .field[aria-invalid='true'] {
+        @apply border-danger-700 focus:border-danger-700 focus:ring-danger-50;
+    }
+    textarea.field {
+        @apply py-2.5 leading-relaxed;
+    }
+    .label {
+        @apply mb-1.5 block text-[13px] font-semibold text-ink;
+    }
+    .hint {
+        @apply mt-1.5 text-xs text-muted;
+    }
+    .error-text {
+        @apply mt-1.5 text-xs font-medium text-danger-700;
+    }
+
+    /* Superfícies */
+    .card,
+    .panel {
+        @apply rounded-(--radius-card) border border-line bg-card shadow-(--shadow-card);
+    }
+
+    .chip {
+        @apply inline-flex items-center gap-1 rounded-full bg-navy-50 px-2.5 py-1 text-xs font-medium text-navy-800;
+    }
+    .badge {
+        @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold;
+    }
+
+    /* Conteúdo rico (HTML sanitizado das vagas) */
+    .prose-job {
+        @apply text-[15px] leading-7 text-ink/90;
+    }
+    .prose-job p {
+        @apply mb-3;
+    }
+    .prose-job ul {
+        @apply mb-3 list-disc space-y-1.5 pl-5 marker:text-action-600;
+    }
+    .prose-job ol {
+        @apply mb-3 list-decimal space-y-1.5 pl-5 marker:font-semibold marker:text-action-600;
+    }
+    .prose-job h3,
+    .prose-job h4 {
+        @apply mt-4 mb-2 font-bold text-ink;
+    }
+    .prose-job a {
+        @apply font-medium text-action-700 underline underline-offset-2 hover:text-action-600;
+    }
+    .prose-job blockquote {
+        @apply my-3 border-l-4 border-line-strong pl-4 text-muted;
+    }
+    .prose-job > :last-child {
+        @apply mb-0;
+    }
+}
+
+@keyframes rise-in {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.animate-rise {
+    animation: rise-in 0.28s ease-out both;
+}
+
+@keyframes shimmer {
+    to {
+        background-position: -200% 0;
+    }
+}
+
+.skeleton {
+    background: linear-gradient(90deg, var(--color-line) 25%, #eef1f7 37%, var(--color-line) 63%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+}
+
+/* Hero estilo "app": azul-marinho profundo, brilhos suaves e grade sutil */
+.hero-app {
+    /* sem overflow:hidden/isolation: a lista de sugestões da busca precisa sobrepor a página */
+    position: relative;
+    background-color: var(--color-navy-950);
+    background-image:
+        radial-gradient(700px 420px at 88% 8%, rgb(59 120 245 / 0.42), transparent 62%),
+        radial-gradient(520px 360px at 8% 105%, rgb(124 92 255 / 0.28), transparent 60%),
+        linear-gradient(rgb(255 255 255 / 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgb(255 255 255 / 0.04) 1px, transparent 1px);
+    background-size: auto, auto, 48px 48px, 48px 48px;
+}
+.text-gradient {
+    background-image: linear-gradient(95deg, #8fb4ff 0%, #6aa0ff 40%, #b49bff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+@keyframes float-y {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+.animate-float { animation: float-y 6s ease-in-out infinite; }

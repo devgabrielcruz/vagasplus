@@ -1,0 +1,1 @@
+{"version":3,"file":"ssr.js","sources":["../../resources/js/ssr.ts"],"sourcesContent":["import { createInertiaApp } from '@inertiajs/vue3';\n\ncreateInertiaApp({\n    pages: './pages',\n    title: (title) => title,\n});\n"],"names":[],"mappings":";;;AAEA,MAAA,gBAAA,iBAAiB;AAAA,EAAA,SAAA,OAAA,MAAA,SAAA;;;;;EACN;AAAA,EACP,OAAO,CAAC,UAAU;AACtB,CAAC;;;;;;;;;"}
