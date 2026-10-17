@@ -29,7 +29,8 @@ defineProps<{ page: 'about' | 'privacy' | 'terms'; title: string; contactEmail: 
                 <div v-else-if="page === 'privacy'" class="prose-job mt-6">
                     <p>Esta política descreve como o VagasPlus trata informações pessoais, em conformidade com a Lei Geral de Proteção de Dados (LGPD – Lei nº 13.709/2018).</p>
                     <h3>Dados que coletamos</h3>
-                    <p>Candidatos não precisam de cadastro e não fornecem dados pessoais ao navegar pelo portal. Podem ser registrados dados técnicos de acesso (como endereço IP, navegador e páginas acessadas) para segurança e estatísticas agregadas.</p>
+                    <p>Navegar pelo portal e buscar vagas não exige cadastro nem o fornecimento de dados pessoais. Podem ser registrados dados técnicos de acesso (como endereço IP, navegador e páginas acessadas) para segurança e estatísticas agregadas.</p>
+                    <p>Se você criar uma conta, coletamos o nome, o e-mail e uma senha (armazenada apenas de forma criptografada, com hash). Usamos esses dados para identificar você, manter sua sessão e, no futuro, gerenciar planos, créditos e pagamentos. Não vendemos esses dados. Você pode pedir a exclusão da conta a qualquer momento pelo e-mail de contato abaixo.</p>
                     <h3>Candidaturas</h3>
                     <p>A candidatura acontece em sites de terceiros. Os dados que você informar lá são tratados pela empresa ou plataforma responsável, segundo as políticas deles.</p>
                     <h3>Cookies e publicidade</h3>

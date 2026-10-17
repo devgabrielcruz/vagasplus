@@ -27,9 +27,24 @@ Route::get('/privacidade', [Site\PageController::class, 'privacy'])->name('priva
 Route::get('/termos', [Site\PageController::class, 'terms'])->name('terms');
 Route::get('/minhas-vagas', [Site\SavedJobsController::class, 'index'])->name('saved.index');
 Route::get('/minhas-vagas/consultar', [Site\SavedJobsController::class, 'check'])->middleware('throttle:60,1')->name('saved.check');
-Route::get('/publicar-vaga', [Site\SubmissionController::class, 'create'])->name('submit.create');
-Route::post('/publicar-vaga', [Site\SubmissionController::class, 'store'])->middleware('throttle:6,60')->name('submit.store');
-Route::get('/publicar-vaga/enviado', [Site\SubmissionController::class, 'done'])->name('submit.done');
+// Publicação de vagas por visitantes: desligada por enquanto (config/features.php, FEATURE_JOB_SUBMISSIONS).
+Route::middleware('feature:job_submissions')->group(function () {
+    Route::get('/publicar-vaga', [Site\SubmissionController::class, 'create'])->name('submit.create');
+    Route::post('/publicar-vaga', [Site\SubmissionController::class, 'store'])->middleware('throttle:6,60')->name('submit.store');
+    Route::get('/publicar-vaga/enviado', [Site\SubmissionController::class, 'done'])->name('submit.done');
+});
+
+// Conta do candidato
+Route::middleware('guest')->group(function () {
+    Route::get('/cadastro', [Site\AuthController::class, 'showRegister'])->name('register');
+    Route::post('/cadastro', [Site\AuthController::class, 'register'])->middleware('throttle:6,60')->name('register.store');
+    Route::get('/entrar', [Site\AuthController::class, 'showLogin'])->name('login');
+    Route::post('/entrar', [Site\AuthController::class, 'login'])->middleware('throttle:20,1')->name('login.store');
+});
+Route::middleware('auth')->group(function () {
+    Route::post('/sair', [Site\AuthController::class, 'logout'])->name('logout');
+    Route::get('/conta', [Site\AccountController::class, 'show'])->name('account');
+});
 Route::get('/sugestoes', Site\SuggestionController::class)->middleware('throttle:90,1')->name('suggestions');
 Route::get('/ads.txt', Site\AdsTxtController::class)->name('ads.txt');
 Route::get('/sitemap.xml', Site\SitemapController::class)->name('sitemap');

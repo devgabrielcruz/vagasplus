@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { Bookmark, Mail, Menu, PenLine, X } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { Bookmark, LogIn, LogOut, Mail, Menu, User, UserPlus, X } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
 import AdBlockWall from '@/components/AdBlockWall.vue';
 import FlashMessages from '@/components/FlashMessages.vue';
 import Logo from '@/components/Logo.vue';
@@ -11,7 +11,9 @@ import type { Seo } from '@/types';
 
 defineProps<{ seo?: Seo }>();
 
-const page = usePage<{ app: { contactEmail: string } }>();
+const page = usePage<{ app: { contactEmail: string }; account: { name: string; email: string; is_admin: boolean } | null }>();
+const account = computed(() => page.props.account);
+const firstName = computed(() => account.value?.name.trim().split(/\s+/)[0] ?? '');
 const open = ref(false);
 const { count: savedCount, message: savedMessage } = useSavedJobs();
 
@@ -47,7 +49,11 @@ const links = [
                     <Link href="/minhas-vagas" class="btn-ghost btn-sm relative inline-flex" :aria-label="savedCount ? `Minhas vagas (${savedCount} salvas)` : 'Minhas vagas'">
                         <Bookmark class="size-4" aria-hidden="true" /><span class="hidden min-[400px]:inline">Minhas vagas</span><span v-if="savedCount" class="grid min-w-5 place-items-center rounded-full bg-action-600 px-1.5 text-[11px] font-bold text-white" aria-hidden="true">{{ savedCount }}</span>
                     </Link>
-                    <Link href="/publicar-vaga" class="btn-primary btn-sm hidden sm:inline-flex"><PenLine class="size-4" aria-hidden="true" />Publicar uma vaga</Link>
+                    <Link v-if="account" href="/conta" class="btn-primary btn-sm hidden max-w-[11rem] sm:inline-flex" :aria-label="`Minha conta (${account.name})`"><User class="size-4 shrink-0" aria-hidden="true" /><span class="truncate">{{ firstName }}</span></Link>
+                    <template v-else>
+                        <Link href="/entrar" class="btn-ghost btn-sm hidden sm:inline-flex"><LogIn class="size-4" aria-hidden="true" />Entrar</Link>
+                        <Link href="/cadastro" class="btn-primary btn-sm hidden sm:inline-flex"><UserPlus class="size-4" aria-hidden="true" />Criar conta</Link>
+                    </template>
                     <button type="button" class="btn-ghost size-11 p-0 md:hidden" :aria-expanded="open" aria-controls="menu-mobile" :aria-label="open ? 'Fechar menu' : 'Abrir menu'" @click="open = !open">
                         <X v-if="open" class="size-5" /><Menu v-else class="size-5" />
                     </button>
@@ -57,7 +63,14 @@ const links = [
             <nav v-show="open" id="menu-mobile" aria-label="Menu móvel" class="border-t border-line bg-white md:hidden">
                 <div class="container-page flex flex-col py-2">
                     <Link v-for="l in links" :key="l.href" :href="l.href" class="rounded-lg px-2 py-3 text-[15px] font-semibold text-ink hover:bg-navy-50" @click="open = false">{{ l.label }}</Link>
-                    <Link href="/publicar-vaga" class="btn-primary my-2" @click="open = false"><PenLine class="size-4" aria-hidden="true" />Publicar uma vaga</Link>
+                    <div v-if="account" class="my-2 flex flex-col gap-2">
+                        <Link href="/conta" class="btn-primary" @click="open = false"><User class="size-4" aria-hidden="true" />Minha conta</Link>
+                        <Link href="/sair" method="post" as="button" class="btn-secondary" @click="open = false"><LogOut class="size-4" aria-hidden="true" />Sair</Link>
+                    </div>
+                    <div v-else class="my-2 grid grid-cols-2 gap-2">
+                        <Link href="/entrar" class="btn-secondary" @click="open = false"><LogIn class="size-4" aria-hidden="true" />Entrar</Link>
+                        <Link href="/cadastro" class="btn-primary" @click="open = false"><UserPlus class="size-4" aria-hidden="true" />Criar conta</Link>
+                    </div>
                 </div>
             </nav>
         </header>
@@ -78,7 +91,11 @@ const links = [
                         <li><Link href="/vagas" class="hover:text-white">Todas as vagas</Link></li>
                         <li><Link href="/vagas?modalidade=remote" class="hover:text-white">Vagas remotas</Link></li>
                         <li><Link href="/categorias" class="hover:text-white">Categorias</Link></li>
-                        <li><Link href="/publicar-vaga" class="hover:text-white">Publicar uma vaga</Link></li>
+                        <li v-if="account"><Link href="/conta" class="hover:text-white">Minha conta</Link></li>
+                        <template v-else>
+                            <li><Link href="/entrar" class="hover:text-white">Entrar</Link></li>
+                            <li><Link href="/cadastro" class="hover:text-white">Criar conta</Link></li>
+                        </template>
                     </ul>
                 </nav>
                 <nav aria-label="Institucional">

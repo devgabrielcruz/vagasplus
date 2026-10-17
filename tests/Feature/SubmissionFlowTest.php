@@ -22,6 +22,7 @@ class SubmissionFlowTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        config(['features.job_submissions' => true]);
         Storage::fake('public');
     }
 

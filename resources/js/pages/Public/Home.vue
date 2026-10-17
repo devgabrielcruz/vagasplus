@@ -36,7 +36,7 @@ const quick = [
 
 <template>
     <PublicLayout :seo="seo">
-        <section class="hero-dots relative flex flex-col overflow-x-clip border-b-2 border-navy-900 lg:min-h-[calc(100svh-4rem)]">
+        <section class="hero-dots relative flex flex-col overflow-x-clip border-b border-navy-900/15 lg:min-h-[calc(100svh-4rem)]">
             <!-- Formas decorativas (cortadas à parte para a lista de sugestões da busca poder sobrepor a página) -->
             <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
                 <div class="absolute -top-24 -right-32 size-[34rem] rounded-full bg-action-100"></div>
@@ -72,9 +72,8 @@ const quick = [
             </div>
 
             <!-- Plataformas em preto e branco (cor só ao passar o mouse) -->
-            <div v-if="platforms.length" class="relative border-t-2 border-navy-900 bg-white">
-                <div class="container-page flex flex flex-wrap items-center justify-center gap-x-6 gap-y-3 py-3.5 sm:gap-x-8 sm:py-4 lg:justify-between">
-                    <span class="text-xs font-extrabold tracking-widest text-navy-900 uppercase">Vagas de</span>
+            <div v-if="platforms.length" class="relative border-t border-navy-900/15 bg-white">
+                <div class="container-page flex flex-wrap items-center justify-center gap-x-6 gap-y-3 py-3.5 sm:gap-x-8 sm:py-4 lg:justify-between">
                     <Link v-for="(p, i) in platforms.slice(0, 8)" :key="p.value" :href="`/vagas?plataforma=${p.value}`" class="items-center opacity-60 grayscale transition hover:opacity-100 hover:grayscale-0" :class="i < 4 ? 'flex' : 'hidden sm:flex'" :title="`Ver vagas via ${p.label}`">
                         <img v-if="p.logo" :src="p.logo" :alt="p.label" class="h-6 w-auto max-w-[6rem] object-contain" />
                         <span v-else class="text-sm font-extrabold text-navy-900">{{ p.label }}</span>

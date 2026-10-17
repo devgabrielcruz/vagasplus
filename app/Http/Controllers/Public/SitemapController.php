@@ -16,9 +16,12 @@ class SitemapController extends Controller
             ['loc' => route('home'), 'lastmod' => null],
             ['loc' => route('jobs.index'), 'lastmod' => null],
             ['loc' => route('categories.index'), 'lastmod' => null],
-            ['loc' => route('submit.create'), 'lastmod' => null],
             ['loc' => route('about'), 'lastmod' => null],
         ];
+
+        if (config('features.job_submissions')) {
+            $urls[] = ['loc' => route('submit.create'), 'lastmod' => null];
+        }
 
         foreach (Category::active()->whereHas('jobPostings', fn ($q) => $q->active())->get() as $category) {
             $urls[] = ['loc' => route('categories.show', $category->slug), 'lastmod' => null];

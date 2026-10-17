@@ -33,6 +33,8 @@ class HandleInertiaRequests extends Middleware
                     ? ['name' => $request->user()->name, 'email' => $request->user()->email]
                     : null,
             ],
+            // Conta logada (candidato ou equipe) para o cabeçalho do site público.
+            'account' => fn () => ($u = $request->user()) ? ['name' => $u->name, 'email' => $u->email, 'is_admin' => (bool) $u->is_admin] : null,
             'pendingSubmissions' => fn () => $request->user()?->is_admin ? \App\Models\JobSubmission::where('status', 'pending')->count() : 0,
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
