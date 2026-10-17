@@ -7,6 +7,7 @@ use App\Services\AssistantUnavailableException;
 use App\Services\JobContext;
 use App\Services\TavusClient;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\RateLimiter;
 
 /** Entrevista em videochamada com avatar de IA (Tavus), a partir dos dados da vaga. */
 class VideoInterviewController extends PublicController
@@ -14,6 +15,15 @@ class VideoInterviewController extends PublicController
     public function start(JobPosting $job, TavusClient $tavus): JsonResponse
     {
         abort_unless($job->isActive(), 404);
+
+        // Cada sala é cobrada por minuto. O limite por IP só gasta cota quando a sala é criada: falhas do provedor não punem o visitante.
+        $ip = (string) request()->ip();
+        $windows = ['hour' => [(int) config('services.tavus.limit_hour'), 3600], 'day' => [(int) config('services.tavus.limit_day'), 86400]];
+        foreach ($windows as $name => [$max]) {
+            if (RateLimiter::tooManyAttempts("video-interview:$name:$ip", $max)) {
+                return response()->json(['message' => 'Você atingiu o limite de entrevistas por vídeo. Tente novamente mais tarde.'], 429);
+            }
+        }
 
         $job->loadMissing('company');
 
@@ -25,6 +35,10 @@ class VideoInterviewController extends PublicController
             );
         } catch (AssistantUnavailableException $e) {
             return response()->json(['message' => $e->getMessage()], $e->getCode() === 429 ? 429 : 503);
+        }
+
+        foreach ($windows as $name => [, $decay]) {
+            RateLimiter::hit("video-interview:$name:$ip", $decay);
         }
 
         return response()->json(['id' => $conversation['id'], 'url' => $conversation['url'], 'seconds' => (int) config('services.tavus.max_call_seconds')]);

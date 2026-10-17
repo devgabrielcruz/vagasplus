@@ -26,12 +26,5 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('ai-assistant', fn (Request $request) => [
             Limit::perMinute(10)->by($request->ip()),
             Limit::perDay(60)->by($request->ip()),
-        ]);
-
-        // Videochamada com avatar é cobrada por minuto: limite bem mais curto que o do texto.
-        RateLimiter::for('video-interview', fn (Request $request) => [
-            Limit::perHour((int) config('services.tavus.limit_hour'))->by($request->ip()),
-            Limit::perDay((int) config('services.tavus.limit_day'))->by($request->ip()),
-        ]);
-    }
+        ]);    }
 }

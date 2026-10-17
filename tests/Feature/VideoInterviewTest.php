@@ -78,6 +78,18 @@ class VideoInterviewTest extends TestCase
         $this->postJson("/vagas/{$job->slug}/entrevista-video")->assertStatus(429);
     }
 
+    public function test_provider_failures_do_not_consume_the_quota(): void
+    {
+        $this->configure();
+        config(['services.tavus.limit_hour' => 2, 'services.tavus.limit_day' => 6]);
+        Http::fake(['tavusapi.com/*' => Http::response(['message' => 'Invalid access token'], 401)]);
+        $job = JobPosting::factory()->create();
+
+        for ($i = 0; $i < 4; $i++) {
+            $this->postJson("/vagas/{$job->slug}/entrevista-video")->assertStatus(503);
+        }
+    }
+
     public function test_ends_the_room(): void
     {
         $this->configure();
