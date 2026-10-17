@@ -80,6 +80,7 @@ class Settings
             'client' => $client,
             'slots' => $slots,
             'demo' => (bool) config('services.ads.demo'),
+            'adblockWall' => (bool) config('services.ads.adblock_wall'),
         ];
     }
 

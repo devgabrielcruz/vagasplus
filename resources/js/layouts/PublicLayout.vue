@@ -2,6 +2,7 @@
 import { Link, usePage } from '@inertiajs/vue3';
 import { Bookmark, Mail, Menu, PenLine, X } from 'lucide-vue-next';
 import { ref } from 'vue';
+import AdBlockWall from '@/components/AdBlockWall.vue';
 import FlashMessages from '@/components/FlashMessages.vue';
 import Logo from '@/components/Logo.vue';
 import SeoHead from '@/components/SeoHead';
@@ -24,6 +25,7 @@ const links = [
 <template>
     <SeoHead :seo="seo" />
     <FlashMessages />
+    <AdBlockWall />
     <div class="pointer-events-none fixed inset-x-0 bottom-4 z-50 flex justify-center px-4" role="status" aria-live="polite">
         <Transition enter-active-class="transition duration-200" enter-from-class="translate-y-2 opacity-0" leave-active-class="transition duration-150" leave-to-class="opacity-0">
             <p v-if="savedMessage" class="pointer-events-auto rounded-xl bg-navy-900 px-4 py-2.5 text-sm font-semibold text-white shadow-(--shadow-pop)">{{ savedMessage }}</p>

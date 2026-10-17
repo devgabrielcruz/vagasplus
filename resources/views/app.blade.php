@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     @php($ads = app(\App\Services\Settings::class)->ads())
     @if ($ads['enabled'] && $ads['client'])
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ $ads['client'] }}" crossorigin="anonymous"></script>
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ $ads['client'] }}" crossorigin="anonymous" onerror="window.__adsBlocked=true"></script>
     @endif
     @vite(['resources/css/app.css', 'resources/js/app.ts'])
     @inertiaHead

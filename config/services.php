@@ -46,6 +46,8 @@ return [
     'ads' => [
         'enabled' => (bool) env('ADS_ENABLED', false),
         'client' => env('ADS_CLIENT_ID'),
+        // Mostra o aviso que pede para desativar o bloqueador de anúncios (só atua com a publicidade ligada).
+        'adblock_wall' => (bool) env('ADS_ADBLOCK_WALL', true),
         // Banners FICTÍCIOS de demonstração nos espaços sem AdSense. Padrão: só em ambiente local.
         'demo' => (bool) env('ADS_DEMO', env('APP_ENV') === 'local'),
         // IDs de unidade do AdSense por posição (ADS_SLOT_HOME_TOP=1234567890 ...). Sem ID, o espaço mostra "Anuncie aqui".
