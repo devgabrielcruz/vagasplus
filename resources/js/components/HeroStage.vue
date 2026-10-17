@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { Bot, CheckCircle2, Info, MapPin, MessagesSquare, Search, Target } from 'lucide-vue-next';
+import { CheckCircle2, Info, MapPin, MessagesSquare, Search, Target, Video } from 'lucide-vue-next';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import CompanyLogo from '@/components/CompanyLogo.vue';
 import { prefersReducedMotion } from '@/composables/useTypewriter';
@@ -8,6 +8,7 @@ import type { JobCardData } from '@/types';
 
 /**
  * Palco animado do hero: alterna sozinho entre "Vagas", "Simulador de entrevista" e "Compatibilidade".
+ * A aba de entrevista é uma videochamada em tela dividida com vídeos demonstrativos (placeholders mudos em loop).
  * Usa vagas REAIS; as falas e as notas da simulação são apenas ilustrativas.
  */
 const props = defineProps<{ jobs: JobCardData[] }>();
@@ -126,6 +127,13 @@ onBeforeUnmount(() => {
     window.clearTimeout(rotate);
 });
 
+// Quem está falando em cada etapa da simulação (0 = recrutadora, 1 = candidato).
+const speaking = computed(() => (stage.value === 0 ? 'recruiter' : stage.value === 1 ? 'candidate' : ''));
+const people = [
+    { key: 'recruiter', label: 'Recrutadora', src: '/videos/recrutadora.mp4', poster: '/videos/recrutadora.jpg', ring: 'ring-action-500', wave: 'text-action-200' },
+    { key: 'candidate', label: 'Você', src: '/videos/candidato.mp4', poster: '/videos/candidato.jpg', ring: 'ring-emerald-300', wave: 'text-emerald-300' },
+];
+
 const strengths = ['Experiência na área', 'Requisitos principais', 'Nível da vaga'];
 const gaps = ['Inglês avançado'];
 </script>
@@ -166,21 +174,28 @@ const gaps = ['Inglês avançado'];
 
                 <!-- ENTREVISTA -->
                 <div v-else-if="active === 'interview'" id="hero-panel-interview" :key="`i${cycle}`" role="tabpanel" aria-labelledby="hero-tab-interview" class="flex h-full flex-col gap-3">
-                    <div class="flex items-center justify-between px-1 text-[11px] font-bold text-navy-100/70">
-                        <span class="flex items-center gap-1.5"><Bot class="size-3.5" aria-hidden="true" />Simulador de entrevista</span>
-                        <span>Pergunta 2 de 5</span>
+                    <div class="flex items-center justify-between gap-2 px-1 text-[11px] font-bold text-navy-100/70">
+                        <span class="flex items-center gap-1.5"><Video class="size-3.5" aria-hidden="true" />Entrevista por vídeo</span>
+                        <span class="flex items-center gap-1.5 rounded-full bg-black/30 px-2 py-0.5 text-white"><i class="size-1.5 animate-pulse rounded-full bg-red-400" aria-hidden="true" />Ao vivo</span>
                     </div>
-                    <div class="flex gap-2">
-                        <span class="grid size-7 shrink-0 place-items-center rounded-full bg-action-600 text-white"><Bot class="size-4" aria-hidden="true" /></span>
-                        <p class="min-h-[3.4rem] rounded-2xl rounded-tl-sm bg-white/10 px-3 py-2 text-[13px] leading-snug text-white">{{ qText }}<span v-if="stage === 0 && !reduced" class="caret" aria-hidden="true" /></p>
+
+                    <!-- Videochamada em tela dividida. Os vídeos são só demonstrativos (mudos, em loop); quem "fala" é indicado pelo contorno e pela legenda. -->
+                    <div class="hero-in grid min-h-0 flex-1 grid-cols-2 gap-2">
+                        <figure v-for="p in people" :key="p.key" class="relative min-h-0 overflow-hidden rounded-2xl bg-navy-950 ring-2 transition-shadow duration-300" :class="speaking === p.key ? p.ring : 'ring-white/10'">
+                            <video class="absolute inset-0 size-full object-cover" :src="p.src" :poster="p.poster" muted loop playsinline preload="metadata" :autoplay="!reduced" disablepictureinpicture tabindex="-1" aria-hidden="true" />
+                            <figcaption class="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-gradient-to-t from-black/70 to-transparent px-2.5 pt-6 pb-2 text-[11px] font-bold text-white">
+                                {{ p.label }}
+                                <span class="wave !h-3 transition-opacity duration-300" :class="[p.wave, speaking === p.key ? 'opacity-100' : 'opacity-0']" aria-hidden="true"><i v-for="n in 4" :key="n" :style="{ animationDelay: `${n * 120}ms` }" /></span>
+                            </figcaption>
+                        </figure>
                     </div>
-                    <div v-if="stage >= 1" class="hero-in flex flex-row-reverse gap-2">
-                        <span class="grid size-7 shrink-0 place-items-center rounded-full bg-white text-[11px] font-extrabold text-navy-900">Você</span>
-                        <p class="min-h-[2.5rem] max-w-[85%] rounded-2xl rounded-tr-sm bg-white px-3 py-2 text-[13px] leading-snug text-ink">
-                            <span v-if="!aText" class="flex h-5 items-center gap-1" aria-label="Digitando"><i class="dot" /><i class="dot [animation-delay:150ms]" /><i class="dot [animation-delay:300ms]" /></span>
-                            <template v-else>{{ aText }}<span v-if="stage === 1 && !reduced" class="caret caret-dark" aria-hidden="true" /></template>
-                        </p>
-                    </div>
+
+                    <!-- Legenda de quem está falando -->
+                    <p v-if="stage < 2" class="min-h-[3.6rem] rounded-xl bg-white/10 px-3 py-2 text-[12px] leading-snug text-white">
+                        <span class="mb-0.5 block text-[10px] font-extrabold tracking-wide uppercase" :class="stage === 0 ? 'text-action-200' : 'text-emerald-300'">{{ stage === 0 ? 'Recrutadora' : 'Você' }}</span>
+                        {{ stage === 0 ? qText : aText }}<span v-if="!reduced" class="caret" aria-hidden="true" />
+                    </p>
+
                     <div v-if="stage >= 2" class="hero-in mt-auto rounded-2xl border border-white/15 bg-white/[0.07] p-3">
                         <div class="flex items-center justify-between">
                             <p class="flex items-center gap-1.5 text-xs font-bold text-emerald-300"><CheckCircle2 class="size-4" aria-hidden="true" />Feedback da resposta</p>
