@@ -7,7 +7,7 @@ withDefaults(defineProps<{ light?: boolean }>(), { light: false });
 </script>
 
 <template>
-    <span class="inline-flex items-center" :class="light ? 'rounded-xl bg-white px-3 py-2' : ''">
-        <img src="/img/logo.png" alt="VagasPlus" width="1399" height="352" class="h-7 w-auto translate-y-[15%] sm:h-8" decoding="async" />
+    <span class="flex w-fit items-center" :class="light ? 'rounded-xl bg-white px-3 py-2' : ''">
+        <img src="/img/logo.png" alt="VagasPlus" width="1654" height="315" class="h-6 w-auto sm:h-7" decoding="async" />
     </span>
 </template>

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { AlertTriangle, ArrowRight, Briefcase, Check, ChevronLeft, ChevronRight, Copy, Cpu, Lightbulb, RotateCcw, Target, Users, Zap } from 'lucide-vue-next';
+import { AlertTriangle, ArrowRight, Briefcase, Check, ChevronLeft, ChevronRight, ClipboardList, Copy, Cpu, Lightbulb, MessagesSquare, RotateCcw, Target, Users, X, Zap } from 'lucide-vue-next';
 import { computed, onActivated, onDeactivated, ref, watch, type Component } from 'vue';
 import { postJson, type AssistantTool } from '@/lib/assistant';
 
 type Question = { category: string; question: string; why: string; how: string };
 
 const props = defineProps<{ slug: string; title: string; company: string; open: boolean }>();
-const emit = defineEmits<{ switch: [tool: AssistantTool] }>();
+const emit = defineEmits<{ switch: [tool: AssistantTool]; close: [] }>();
 
 const questions = ref<Question[]>([]);
 const loading = ref(false);
@@ -103,14 +103,41 @@ watch(() => props.open, (v) => v && load(), { immediate: true });
 </script>
 
 <template>
-    <div class="flex h-full flex-col">
+    <div class="qt-paper relative flex h-full flex-col md:flex-row">
+        <button type="button" class="absolute top-3 right-3 z-10 grid size-10 place-items-center rounded-full text-amber-900/60 transition-colors hover:bg-amber-200/60 hover:text-navy-900" aria-label="Fechar" @click="emit('close')"><X class="size-5" aria-hidden="true" /></button>
+
+        <!-- Cabeçalho "caderno de estudos": etiqueta amarela, título e ação de copiar -->
+        <header class="relative shrink-0 border-b-2 border-dashed border-amber-300/80 bg-gradient-to-b from-amber-100 to-[#fffaf1] px-5 pt-8 pb-4 sm:px-7 sm:pt-5 md:flex md:w-72 md:shrink-0 md:flex-col md:border-r-2 md:border-b-0 md:px-5 md:pt-8 md:pb-5">
+            <div class="flex items-center gap-3.5 pr-10 md:pr-0">
+                <span class="grid size-12 shrink-0 -rotate-3 place-items-center rounded-2xl border-2 border-navy-900 bg-amber-300 text-navy-900 shadow-[3px_3px_0_0_var(--color-navy-900)]"><ClipboardList class="size-6" aria-hidden="true" /></span>
+                <div class="min-w-0 flex-1">
+                    <h2 class="text-lg leading-tight font-extrabold text-navy-900">Perguntas prováveis</h2>
+                    <p class="truncate text-xs font-medium text-amber-900/70">{{ title }} · {{ company }}</p>
+                </div>
+                <button v-if="questions.length" type="button" class="hidden items-center gap-1.5 rounded-full border-2 border-navy-900/15 bg-white px-3 py-1.5 text-xs font-bold text-navy-900 transition hover:border-navy-900 sm:inline-flex md:hidden" @click="copyAll"><component :is="copied ? Check : Copy" class="size-3.5" aria-hidden="true" />{{ copied ? 'Copiadas!' : 'Copiar todas' }}</button>
+            </div>
+
+            <!-- Desktop: todas as perguntas numa lista lateral (clique para ir direto) -->
+            <nav v-if="questions.length" class="mt-5 hidden min-h-0 flex-1 space-y-1.5 overflow-y-auto pr-1 md:block" aria-label="Perguntas">
+                <button v-for="(q, i) in questions" :key="i" type="button" class="flex w-full items-start gap-2.5 rounded-xl px-2.5 py-2 text-left transition-colors" :class="i === index ? 'bg-white shadow-sm ring-1 ring-amber-300' : 'hover:bg-amber-100/70'" :aria-current="i === index" @click="go(i)">
+                    <span class="mt-0.5 grid size-6 shrink-0 place-items-center rounded-full text-[11px] font-extrabold text-white" :class="themeOf(q.category).bar">{{ i + 1 }}</span>
+                    <span class="min-w-0"><span class="block text-[10px] font-bold tracking-wider text-amber-900/60 uppercase">{{ q.category }}</span><span class="line-clamp-2 text-xs leading-snug font-semibold text-navy-900">{{ q.question }}</span></span>
+                </button>
+            </nav>
+            <div v-if="questions.length" class="mt-4 hidden space-y-2 md:block">
+                <button type="button" class="inline-flex w-full items-center justify-center gap-1.5 rounded-full border-2 border-navy-900/15 bg-white px-3 py-1.5 text-xs font-bold text-navy-900 transition hover:border-navy-900" @click="copyAll"><component :is="copied ? Check : Copy" class="size-3.5" aria-hidden="true" />{{ copied ? 'Copiadas!' : 'Copiar todas' }}</button>
+                <!-- Atalho separado da navegação: leva para a simulação, não para a próxima pergunta -->
+                <button type="button" class="flex w-full items-center gap-2.5 rounded-2xl border-2 border-navy-900 bg-navy-900 p-3 text-left text-white transition hover:bg-navy-800" @click="emit('switch', 'interview')"><MessagesSquare class="size-5 shrink-0 text-amber-300" aria-hidden="true" /><span class="min-w-0"><span class="block text-xs font-extrabold">Quer treinar de verdade?</span><span class="block text-[11px] text-navy-100/75">Abrir a simulação de entrevista</span></span></button>
+            </div>
+        </header>
+
         <!-- Carregando -->
         <div v-if="loading" class="flex flex-1 flex-col items-center justify-center px-8" role="status" aria-label="Gerando perguntas">
-            <div class="qt-skel w-full max-w-sm overflow-hidden rounded-3xl border border-line">
-                <div class="h-36 bg-linear-to-br from-action-600/80 to-navy-800/80" />
-                <div class="space-y-3 p-5"><span class="block h-3 w-3/4 rounded-full bg-surface" /><span class="block h-3 w-1/2 rounded-full bg-surface" /></div>
+            <div class="qt-skel relative w-full max-w-sm -rotate-1 overflow-hidden rounded-3xl border-2 border-navy-900/10 bg-white shadow-(--shadow-pop)">
+                <div class="h-32 bg-linear-to-br from-amber-300 to-orange-400" />
+                <div class="space-y-3 p-5"><span class="block h-3 w-3/4 rounded-full bg-amber-100" /><span class="block h-3 w-1/2 rounded-full bg-amber-100" /><span class="block h-3 w-2/3 rounded-full bg-amber-100" /></div>
             </div>
-            <p class="mt-6 text-sm font-medium text-muted">Analisando a vaga e preparando as perguntas…</p>
+            <p class="mt-7 text-sm font-semibold text-amber-900/80">Analisando a vaga e preparando as perguntas…</p>
         </div>
 
         <!-- Erro -->
@@ -121,30 +148,29 @@ watch(() => props.open, (v) => v && load(), { immediate: true });
         </div>
 
         <!-- Baralho de perguntas -->
-        <template v-else-if="current">
-            <!-- Trilha: uma barrinha colorida por pergunta, clicável -->
-            <div class="flex shrink-0 gap-1.5 px-5 pt-5 sm:px-8" role="group" aria-label="Ir para a pergunta">
-                <button v-for="(q, i) in questions" :key="i" type="button" class="group flex-1 py-1.5" :aria-label="`Pergunta ${i + 1}: ${q.category}`" :aria-current="i === index" @click="go(i)">
-                    <span class="block h-1.5 rounded-full transition-all duration-300" :class="[themeOf(q.category).bar, i === index ? 'opacity-100' : i < index ? 'opacity-50' : 'opacity-20 group-hover:opacity-40']" />
-                </button>
+        <div v-else-if="current" class="flex min-h-0 min-w-0 flex-1 flex-col">
+            <!-- Trilha numerada: cada pergunta tem a cor da sua categoria -->
+            <div class="flex shrink-0 items-center justify-center gap-1.5 px-5 pt-4 sm:px-8 md:hidden" role="group" aria-label="Ir para a pergunta">
+                <button v-for="(q, i) in questions" :key="i" type="button" class="grid size-8 place-items-center rounded-full text-xs font-extrabold transition-all duration-200" :class="i === index ? [themeOf(q.category).bar, 'scale-110 text-white shadow-md'] : 'bg-white text-amber-900/60 ring-1 ring-amber-200 hover:ring-amber-400'" :aria-label="`Pergunta ${i + 1}: ${q.category}`" :aria-current="i === index" @click="go(i)">{{ i + 1 }}</button>
             </div>
 
             <div class="flex min-h-0 flex-1 items-center gap-2 overflow-y-auto px-3 py-5 sm:gap-4 sm:px-5">
                 <!-- Seta anterior (desktop) -->
                 <button type="button" class="qt-arrow hidden sm:grid" aria-label="Pergunta anterior" :disabled="!hasPrev" @click="go(index - 1)"><ChevronLeft class="size-6" aria-hidden="true" /></button>
 
-                <div class="relative mx-auto my-auto min-w-0 flex-1 touch-pan-y select-none sm:max-w-[26rem]" @pointerdown="swipeStart" @pointerup="swipeEnd" @pointercancel="tracking = false">
+                <div class="relative mx-auto my-auto min-w-0 flex-1 touch-pan-y select-none sm:max-w-[26rem] md:max-w-[32rem]" @pointerdown="swipeStart" @pointerup="swipeEnd" @pointercancel="tracking = false">
                     <!-- Cartas de trás: indicam que há mais perguntas -->
-                    <span v-if="hasNext" class="absolute inset-x-5 -bottom-2.5 h-10 rounded-3xl border border-line bg-white shadow-(--shadow-xs)" aria-hidden="true" />
-                    <span v-if="index < questions.length - 2" class="absolute inset-x-9 -bottom-5 h-10 rounded-3xl border border-line bg-surface" aria-hidden="true" />
+                    <span v-if="hasNext" class="absolute inset-x-5 -bottom-2.5 h-10 rotate-1 rounded-3xl border-2 border-navy-900/10 bg-white" aria-hidden="true" />
+                    <span v-if="index < questions.length - 2" class="absolute inset-x-9 -bottom-5 h-10 -rotate-1 rounded-3xl border-2 border-navy-900/10 bg-amber-50" aria-hidden="true" />
 
                     <Transition :name="forward ? 'deck-next' : 'deck-prev'" mode="out-in">
-                        <article :key="index" class="relative overflow-hidden rounded-3xl border border-line bg-white shadow-(--shadow-pop)">
+                        <article :key="index" class="relative overflow-hidden rounded-3xl border-2 border-navy-900 bg-white shadow-[5px_5px_0_0_var(--color-navy-900)]">
                             <!-- Topo colorido com a pergunta -->
                             <div class="relative overflow-hidden bg-linear-to-br px-5 pt-5 pb-6 text-white sm:px-6" :class="look.grad">
                                 <span class="pointer-events-none absolute -top-3 -right-1 text-[7rem] leading-none font-black text-white/10 tabular-nums" aria-hidden="true">{{ index + 1 }}</span>
                                 <p class="relative flex items-center gap-2 text-xs font-bold tracking-widest uppercase">
                                     <span class="grid size-7 place-items-center rounded-lg bg-white/20"><component :is="look.icon" class="size-4" aria-hidden="true" /></span>{{ current.category }}
+                                    <span class="ml-auto rounded-full bg-white/20 px-2 py-0.5 text-[11px] tracking-normal normal-case tabular-nums">{{ index + 1 }} de {{ questions.length }}</span>
                                 </p>
                                 <h3 class="relative mt-4 text-xl leading-snug font-extrabold text-balance sm:text-[1.4rem] sm:leading-snug">{{ current.question }}</h3>
                             </div>
@@ -168,49 +194,45 @@ watch(() => props.open, (v) => v && load(), { immediate: true });
                 <button type="button" class="qt-arrow hidden sm:grid" aria-label="Próxima pergunta" :disabled="!hasNext" @click="go(index + 1)"><ChevronRight class="size-6" aria-hidden="true" /></button>
             </div>
 
-            <!-- Navegação no celular: setas grandes ao lado do contador -->
-            <div class="flex shrink-0 items-center justify-center gap-5 pb-3 sm:hidden">
+            <!-- Navegação no celular -->
+            <div class="flex shrink-0 flex-wrap items-center justify-center gap-x-5 gap-y-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:hidden">
                 <button type="button" class="qt-arrow grid" aria-label="Pergunta anterior" :disabled="!hasPrev" @click="go(index - 1)"><ChevronLeft class="size-6" aria-hidden="true" /></button>
-                <p class="min-w-16 text-center text-sm font-bold text-ink tabular-nums">{{ index + 1 }} <span class="text-subtle">/ {{ questions.length }}</span></p>
+                <p class="min-w-16 text-center text-sm font-bold text-navy-900 tabular-nums">{{ index + 1 }} <span class="text-amber-900/50">/ {{ questions.length }}</span></p>
                 <button type="button" class="qt-arrow grid" aria-label="Próxima pergunta" :disabled="!hasNext" @click="go(index + 1)"><ChevronRight class="size-6" aria-hidden="true" /></button>
+                <!-- Atalhos do celular (no desktop ficam na coluna lateral) -->
+                <div class="flex w-full items-center justify-center gap-2 px-4">
+                    <button type="button" class="inline-flex items-center gap-1.5 rounded-full border-2 border-navy-900/15 bg-white px-3 py-1.5 text-xs font-bold text-navy-900" @click="copyAll"><component :is="copied ? Check : Copy" class="size-3.5" aria-hidden="true" />{{ copied ? 'Copiadas!' : 'Copiar' }}</button>
+                    <button type="button" class="inline-flex items-center gap-1.5 rounded-full border-2 border-navy-900 bg-navy-900 px-3 py-1.5 text-xs font-bold text-white" @click="emit('switch', 'interview')"><MessagesSquare class="size-3.5 text-amber-300" aria-hidden="true" />Simular entrevista</button>
+                </div>
             </div>
-
-            <footer class="flex shrink-0 items-center justify-between gap-3 border-t border-line/70 px-5 py-3.5 pb-[max(0.875rem,env(safe-area-inset-bottom))] sm:px-8">
-                <p class="hidden items-center gap-3 text-xs text-subtle sm:flex">
-                    <span><kbd class="rounded border border-line-strong px-1.5 py-0.5 font-sans font-semibold">←</kbd> <kbd class="rounded border border-line-strong px-1.5 py-0.5 font-sans font-semibold">→</kbd> navegar</span>
-                    <button type="button" class="inline-flex items-center gap-1 font-semibold text-muted hover:text-ink" @click="copyAll"><component :is="copied ? Check : Copy" class="size-3.5" aria-hidden="true" />{{ copied ? 'Copiadas!' : 'Copiar todas' }}</button>
-                </p>
-                <button type="button" class="inline-flex items-center gap-1 text-xs font-semibold text-muted hover:text-ink sm:hidden" @click="copyAll"><component :is="copied ? Check : Copy" class="size-3.5" aria-hidden="true" />{{ copied ? 'Copiadas!' : 'Copiar' }}</button>
-
-                <button type="button" data-autofocus :class="hasNext ? 'btn-secondary' : 'btn-primary'" @click="emit('switch', 'interview')">Praticar na entrevista<ArrowRight class="size-4" aria-hidden="true" /></button>
-            </footer>
-        </template>
+        </div>
     </div>
 </template>
 
 <style scoped>
+/* Papel pautado discreto no fundo */
+.qt-paper {
+    background-image: repeating-linear-gradient(transparent 0, transparent 31px, rgb(245 158 11 / 0.08) 31px, rgb(245 158 11 / 0.08) 32px);
+}
 .qt-arrow {
     width: 2.75rem;
     height: 2.75rem;
     flex-shrink: 0;
     place-items: center;
     border-radius: 9999px;
-    border: 1px solid var(--color-line-strong);
+    border: 2px solid var(--color-navy-900);
     background: white;
-    color: var(--color-ink);
-    box-shadow: var(--shadow-card);
+    color: var(--color-navy-900);
+    box-shadow: 2px 2px 0 0 var(--color-navy-900);
     transition:
         transform 0.2s ease,
-        border-color 0.2s ease,
         background-color 0.2s ease,
         color 0.2s ease,
         opacity 0.2s ease;
 }
 .qt-arrow:not(:disabled):hover {
-    transform: scale(1.1);
-    border-color: var(--color-action-600);
-    background: var(--color-action-600);
-    color: white;
+    transform: translate(-1px, -1px);
+    background: var(--color-amber-300);
 }
 .qt-arrow:disabled {
     opacity: 0.35;
@@ -250,7 +272,7 @@ watch(() => props.open, (v) => v && load(), { immediate: true });
 }
 @keyframes qt-pulse {
     50% {
-        opacity: 0.55;
+        opacity: 0.6;
     }
 }
 </style>

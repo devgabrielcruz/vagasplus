@@ -18,7 +18,7 @@ function submit() {
 </script>
 
 <template>
-    <form method="get" action="/vagas" role="search" class="flex flex-col gap-2 rounded-[1.4rem] bg-white p-2.5 shadow-[0_20px_50px_-15px_rgb(0_0_0/0.5)] sm:flex-row sm:items-center" @submit.prevent="submit">
+    <form method="get" action="/vagas" role="search" class="flex flex-col gap-2 rounded-2xl border-2 border-navy-900 bg-white p-2 shadow-[5px_5px_0_0_var(--color-navy-900)] sm:flex-row sm:items-center" @submit.prevent="submit">
         <div class="flex-1">
             <Autocomplete id="hero-q" v-model="form.q" name="q" label="Cargo, habilidade ou palavra-chave" endpoint="/sugestoes" :params="{ field: 'q' }" placeholder="Cargo, habilidade ou empresa" input-class="field border-transparent pl-10 focus:border-action-600 sm:min-h-12">
                 <template #icon><Search class="pointer-events-none absolute top-1/2 left-3.5 size-4.5 -translate-y-1/2 text-subtle" aria-hidden="true" /></template>

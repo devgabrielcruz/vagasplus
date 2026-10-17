@@ -19,6 +19,8 @@
     </source>
     <php>
         <env name="APP_ENV" value="testing"/>
+        <env name="ADS_ENABLED" value="false"/>
+        <env name="ADS_CLIENT_ID" value=""/>
         <env name="INERTIA_SSR_ENABLED" value="false"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>

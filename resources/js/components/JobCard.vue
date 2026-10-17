@@ -16,7 +16,7 @@ const modeStyle: Record<string, string> = {
 </script>
 
 <template>
-    <article class="group card relative p-4 transition duration-150 hover:-translate-y-0.5 hover:border-line-strong hover:shadow-(--shadow-lift) sm:p-5">
+    <article class="group card relative p-4 transition duration-150 hover:-translate-y-0.5 hover:border-navy-900/25 hover:shadow-(--shadow-lift) sm:p-5">
         <div class="flex gap-3.5">
             <CompanyLogo :name="job.company.name" :url="job.company.logo_url" size="md" />
 

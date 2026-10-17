@@ -35,17 +35,17 @@ const links = [
     <a href="#conteudo" class="sr-only z-50 rounded-md bg-white px-4 py-2 font-semibold text-navy-900 focus:not-sr-only focus:fixed focus:top-2 focus:left-2">Pular para o conteúdo</a>
 
     <div class="flex min-h-screen flex-col">
-        <header class="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/85">
+        <header class="sticky top-0 z-40 border-b border-navy-900/10 bg-white">
             <div class="container-page flex h-16 items-center justify-between gap-4">
                 <Link href="/" aria-label="VagasPlus — página inicial"><Logo /></Link>
 
                 <nav aria-label="Principal" class="hidden items-center gap-1 md:flex">
-                    <Link v-for="l in links" :key="l.href" :href="l.href" class="rounded-lg px-3 py-2 text-sm font-semibold text-muted hover:bg-navy-50 hover:text-ink">{{ l.label }}</Link>
+                    <Link v-for="l in links" :key="l.href" :href="l.href" class="rounded-lg px-3 py-2 text-sm font-semibold text-muted transition-colors hover:bg-navy-50 hover:text-ink">{{ l.label }}</Link>
                 </nav>
 
                 <div class="flex items-center gap-2">
-                    <Link href="/minhas-vagas" class="btn-ghost btn-sm relative hidden sm:inline-flex" :aria-label="savedCount ? `Minhas vagas (${savedCount} salvas)` : 'Minhas vagas'">
-                        <Bookmark class="size-4" aria-hidden="true" />Minhas vagas<span v-if="savedCount" class="grid min-w-5 place-items-center rounded-full bg-action-600 px-1.5 text-[11px] font-bold text-white" aria-hidden="true">{{ savedCount }}</span>
+                    <Link href="/minhas-vagas" class="btn-ghost btn-sm relative inline-flex" :aria-label="savedCount ? `Minhas vagas (${savedCount} salvas)` : 'Minhas vagas'">
+                        <Bookmark class="size-4" aria-hidden="true" /><span class="hidden min-[400px]:inline">Minhas vagas</span><span v-if="savedCount" class="grid min-w-5 place-items-center rounded-full bg-action-600 px-1.5 text-[11px] font-bold text-white" aria-hidden="true">{{ savedCount }}</span>
                     </Link>
                     <Link href="/publicar-vaga" class="btn-primary btn-sm hidden sm:inline-flex"><PenLine class="size-4" aria-hidden="true" />Publicar uma vaga</Link>
                     <button type="button" class="btn-ghost size-11 p-0 md:hidden" :aria-expanded="open" aria-controls="menu-mobile" :aria-label="open ? 'Fechar menu' : 'Abrir menu'" @click="open = !open">
@@ -57,7 +57,6 @@ const links = [
             <nav v-show="open" id="menu-mobile" aria-label="Menu móvel" class="border-t border-line bg-white md:hidden">
                 <div class="container-page flex flex-col py-2">
                     <Link v-for="l in links" :key="l.href" :href="l.href" class="rounded-lg px-2 py-3 text-[15px] font-semibold text-ink hover:bg-navy-50" @click="open = false">{{ l.label }}</Link>
-                    <Link href="/minhas-vagas" class="flex items-center gap-2 rounded-lg px-2 py-3 text-[15px] font-semibold text-ink hover:bg-navy-50" @click="open = false"><Bookmark class="size-4.5" aria-hidden="true" />Minhas vagas<span v-if="savedCount" class="ml-1 grid min-w-5 place-items-center rounded-full bg-action-600 px-1.5 text-[11px] font-bold text-white">{{ savedCount }}</span></Link>
                     <Link href="/publicar-vaga" class="btn-primary my-2" @click="open = false"><PenLine class="size-4" aria-hidden="true" />Publicar uma vaga</Link>
                 </div>
             </nav>
@@ -67,7 +66,7 @@ const links = [
             <slot />
         </main>
 
-        <footer class="mt-16 bg-navy-950 text-navy-100">
+        <footer class="mt-16 border-t-4 border-action-600 bg-navy-950 text-navy-100">
             <div class="container-page grid gap-10 py-12 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
                 <div>
                     <Logo light />
