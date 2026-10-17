@@ -42,6 +42,17 @@ return [
         'model' => env('GEMINI_MODEL', 'gemini-3.5-flash-lite'),
     ],
 
+    // Entrevista por videochamada com avatar (Tavus CVI). Sem chave/PAL, o recurso fica oculto.
+    'tavus' => [
+        'key' => env('TAVUS_API_KEY'),
+        'pal_id' => env('TAVUS_PAL_ID'),
+        'face_id' => env('TAVUS_FACE_ID'), // opcional: sem ele vale o rosto padrão do PAL
+        'max_call_seconds' => (int) env('TAVUS_MAX_CALL_SECONDS', 300),
+        // Limite de salas por IP (cada sala é cobrada por minuto). Em produção, mantenha baixo.
+        'limit_hour' => (int) env('TAVUS_LIMIT_HOUR', 3),
+        'limit_day' => (int) env('TAVUS_LIMIT_DAY', 6),
+    ],
+
     // Publicidade (AdSense etc.). Desligada por padrão: os espaços só são renderizados quando ADS_ENABLED=true.
     'ads' => [
         'enabled' => (bool) env('ADS_ENABLED', false),

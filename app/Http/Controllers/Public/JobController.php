@@ -6,6 +6,7 @@ use App\Enums\JobStatus;
 use App\Models\JobPosting;
 use App\Services\GeminiClient;
 use App\Services\JobSearch;
+use App\Services\TavusClient;
 use App\Support\JobPostingSchema;
 use App\Support\JobPresenter;
 use App\Support\Seo;
@@ -42,7 +43,7 @@ class JobController extends PublicController
         ]);
     }
 
-    public function show(JobPosting $job, JobSearch $search, GeminiClient $gemini)
+    public function show(JobPosting $job, JobSearch $search, GeminiClient $gemini, TavusClient $tavus)
     {
         $job->loadMissing(['company', 'location', 'category']);
         $status = $job->effectiveStatus();
@@ -64,6 +65,7 @@ class JobController extends PublicController
             'closed' => ! $active,
             'preview' => false,
             'assistantEnabled' => $active && $gemini->configured(),
+            'videoEnabled' => $active && $tavus->configured(),
             'related' => $related,
             'breadcrumbs' => array_values(array_filter([
                 ['label' => 'Início', 'url' => route('home')],

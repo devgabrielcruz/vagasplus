@@ -17,6 +17,8 @@ Route::middleware('throttle:ai-assistant')->group(function () {
     Route::post('/vagas/{job:slug}/perguntas-provaveis', [Site\AssistantController::class, 'questions'])->name('jobs.questions');
     Route::post('/vagas/{job:slug}/compatibilidade', [Site\AssistantController::class, 'match'])->name('jobs.match');
 });
+Route::post('/vagas/{job:slug}/entrevista-video', [Site\VideoInterviewController::class, 'start'])->middleware('throttle:video-interview')->name('jobs.video.start');
+Route::post('/entrevista-video/{conversation}/encerrar', [Site\VideoInterviewController::class, 'end'])->where('conversation', '[A-Za-z0-9]{8,40}')->middleware('throttle:30,1')->name('jobs.video.end');
 Route::get('/categorias', [Site\CategoryController::class, 'index'])->name('categories.index');
 Route::get('/categorias/{slug}', [Site\CategoryController::class, 'show'])->name('categories.show');
 Route::get('/localidades/{slug}', [Site\LocationController::class, 'show'])->name('locations.show');

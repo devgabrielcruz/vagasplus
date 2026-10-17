@@ -1,10 +1,11 @@
-import { ClipboardList, MessagesSquare, Target } from 'lucide-vue-next';
+import { ClipboardList, MessagesSquare, Target, Video } from 'lucide-vue-next';
 
-export type AssistantTool = 'interview' | 'questions' | 'match';
+export type AssistantTool = 'interview' | 'questions' | 'match' | 'video';
 
 // Metadados das ferramentas de IA da vaga: usados pelo atalho da página e pelas abas do painel.
 export const ASSISTANT_TOOLS = [
     { key: 'interview', label: 'Simular entrevista', tab: 'Entrevista', tabShort: 'Entrevista', hint: 'Converse com um recrutador virtual', icon: MessagesSquare, tile: 'bg-action-50 text-action-700', glow: 'bg-action-500/25' },
+    { key: 'video', label: 'Entrevista por vídeo', tab: 'Vídeo', tabShort: 'Vídeo', hint: 'Videochamada com um recrutador virtual', icon: Video, tile: 'bg-navy-50 text-navy-700', glow: 'bg-action-500/25' },
     { key: 'questions', label: 'Perguntas prováveis', tab: 'Perguntas', tabShort: 'Perguntas', hint: 'O que costumam perguntar e como responder', icon: ClipboardList, tile: 'bg-warning-50 text-warning-700', glow: 'bg-amber-400/30' },
     { key: 'match', label: 'Verificar minha compatibilidade', tab: 'Compatibilidade', tabShort: 'Currículo', hint: 'Veja se seu currículo combina com a vaga', icon: Target, tile: 'bg-success-50 text-success-700', glow: 'bg-emerald-400/30' },
 ] as const;

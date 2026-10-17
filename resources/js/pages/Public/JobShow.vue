@@ -21,6 +21,7 @@ const props = defineProps<{
     closed: boolean;
     preview: boolean;
     assistantEnabled?: boolean;
+    videoEnabled?: boolean;
     previewStatus?: string;
     editUrl?: string;
     related: JobCardData[];
@@ -131,7 +132,7 @@ const mailHref = computed(() => `mailto:${props.job.apply_email}?subject=${encod
                     </header>
 
                     <!-- Celular/tablet: ferramentas de IA logo abaixo do cabeçalho (no desktop ficam na coluna lateral direita) -->
-                    <AssistantTools v-if="assistantEnabled" variant="chips" class="mt-4 lg:hidden" @pick="tool = $event" />
+                    <AssistantTools v-if="assistantEnabled || videoEnabled" variant="chips" :text="!!assistantEnabled" :video="!!videoEnabled" class="mt-4 lg:hidden" @pick="tool = $event" />
 
                     <!-- Anúncio logo abaixo do cabeçalho: visível sem rolar -->
                     <div class="mt-4"><AdSlot placement="job-top" format="leaderboard" /></div>
@@ -175,7 +176,7 @@ const mailHref = computed(() => `mailto:${props.job.apply_email}?subject=${encod
 
                         </div>
 
-                        <AssistantTools v-if="assistantEnabled" variant="card" class="hidden lg:block" @pick="tool = $event" />
+                        <AssistantTools v-if="assistantEnabled || videoEnabled" variant="card" :text="!!assistantEnabled" :video="!!videoEnabled" class="hidden lg:block" @pick="tool = $event" />
 
                         <!-- Abaixo de xl a coluna esquerda não existe: o compartilhar fica aqui -->
                         <div class="card p-3.5 xl:hidden"><ShareButtons :url="shareUrl" :title="`${job.title} - ${job.company.name}`" /></div>
@@ -193,6 +194,6 @@ const mailHref = computed(() => `mailto:${props.job.apply_email}?subject=${encod
 
             <div v-if="!closed && !preview" class="mt-8"><Link href="/vagas" class="inline-flex items-center gap-1.5 text-sm font-bold text-action-700 hover:underline"><ArrowLeft class="size-4" aria-hidden="true" />Voltar para todas as vagas</Link></div>
         </div>
-        <AssistantHub v-if="assistantEnabled" v-model:tool="tool" :slug="job.slug" :title="job.title" :company="job.company.name" />
+        <AssistantHub v-if="assistantEnabled || videoEnabled"v-model:tool="tool" :slug="job.slug" :title="job.title" :company="job.company.name" />
     </PublicLayout>
 </template>
